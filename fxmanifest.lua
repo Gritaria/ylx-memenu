@@ -3,10 +3,10 @@ rdr3_warning 'I acknowledge that this is a prerelease build of RedM, and I am aw
 fx_version 'rdr3' 
 games { 'rdr3' }
 
-name 'Comandos /me com ox_lib (RedM)'
+name 'ylx-memenu'
 author 'yLx'
-description 'Implementação de /me aprimorada com ox_lib para RedM'
-version '1.0.4'
+description 'Sistema de status médico 3D para RedM - 100% Standalone (sem dependências)'
+version '2.0.0'
 
 ui_page 'UI/index.html'
 
