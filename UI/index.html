@@ -1,0 +1,147 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Status NUI - Dark Minimal</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@300;400;700&display=swap"
+        rel="stylesheet">
+
+    <!-- Link para o CSS separado -->
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="flex items-center justify-center select-none">
+
+    <!-- Container Wrapper -->
+    <div id="app-container">
+
+        <!-- Card Principal -->
+        <div class="hud-card w-[350px] rounded-sm text-gray-200 flex flex-col relative overflow-hidden">
+
+            <!-- Header -->
+            <div class="bg-neutral-900 p-3 border-b border-neutral-800 flex justify-between items-center">
+                <h1 class="text-sm font-bold tracking-widest text-neutral-400 uppercase">Menu</h1>
+                <div class="flex gap-2">
+                    <button onclick="closeUI()"
+                        class="text-xs text-neutral-500 hover:text-white transition uppercase mr-2">Fechar</button>
+                    <button onclick="resetAll()"
+                        class="text-xs text-red-900 hover:text-red-500 transition font-bold uppercase">Limpar</button>
+                </div>
+            </div>
+
+            <!-- Corpo -->
+            <div class="p-4 space-y-4">
+                <!-- Seleção de Local -->
+                <div>
+                    <label class="block text-[10px] uppercase text-neutral-500 font-bold mb-1">Local do Corpo</label>
+                    <select id="part-select" onchange="loadPartData()"
+                        class="w-full bg-neutral-800 border border-neutral-700 text-sm text-white px-2 py-2 rounded-sm focus:outline-none focus:border-neutral-500 uppercase">
+                        <option value="cabeca" selected>Cabeça</option>
+                        <option value="tronco">Tronco</option>
+                        <option value="mao_esq">Mão Esquerda</option>
+                        <option value="mao_dir">Mão Direita</option>
+                        <option value="pe_esq">Pé Esquerdo</option>
+                        <option value="pe_dir">Pé Direito</option>
+                    </select>
+                </div>
+
+                <!-- Input Texto -->
+                <div>
+                    <label class="block text-[10px] uppercase text-neutral-500 font-bold mb-1">Descrição</label>
+                    <input type="text" id="text-input" placeholder="Ex: Fratura exposta..."
+                        class="w-full bg-neutral-800 border-b-2 border-neutral-700 text-sm px-2 py-2 focus:outline-none focus:border-white transition-colors placeholder-neutral-600">
+                </div>
+
+                <!-- Sliders -->
+                <div class="space-y-3 pt-2">
+                    <!-- Tempo -->
+                    <div>
+                        <div class="flex justify-between items-end mb-1">
+                            <label class="text-[10px] uppercase text-neutral-500 font-bold">Tempo de Exibição</label>
+                            <span id="time-display" class="text-xs font-mono text-neutral-300">7s</span>
+                        </div>
+                        <input type="range" id="time-slider" min="3" max="60" value="7"
+                            oninput="updateDisplay('time-display', this.value, 's')">
+                        <div class="flex justify-between text-[8px] text-neutral-600 mt-1">
+                            <span>3s</span><span>60s</span>
+                        </div>
+                    </div>
+                    <!-- Distância -->
+                    <div>
+                        <div class="flex justify-between items-end mb-1">
+                            <label class="text-[10px] uppercase text-neutral-500 font-bold">Distância Visível</label>
+                            <span id="dist-display" class="text-xs font-mono text-neutral-300">10m</span>
+                        </div>
+                        <input type="range" id="dist-slider" min="1" max="25" value="10"
+                            oninput="updateDisplay('dist-display', this.value, 'm')">
+                        <div class="flex justify-between text-[8px] text-neutral-600 mt-1">
+                            <span>1m</span><span>25m</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Fundo Escuro nos Textos -->
+                <div class="flex items-center gap-2 pt-1">
+                    <input type="checkbox" id="text-background-checkbox" checked
+                        onchange="toggleTextBackground(this.checked)"
+                        class="w-4 h-4 bg-neutral-800 border border-neutral-600 rounded cursor-pointer accent-neutral-400">
+                    <label for="text-background-checkbox"
+                        class="text-[10px] uppercase text-neutral-500 font-bold cursor-pointer">Fundo Escuro nos
+                        Textos</label>
+                </div>
+
+                <!-- Cores -->
+                <div>
+                    <label class="block text-[10px] uppercase text-neutral-500 font-bold mb-2">Cor do Indicador</label>
+                    <div class="flex items-center justify-between">
+                        <div class="flex gap-2 items-center">
+                            <button onclick="setColor('#ffffff')"
+                                class="color-btn w-5 h-5 rounded-full bg-white border border-neutral-600"></button>
+                            <button onclick="setColor('#ef4444')"
+                                class="color-btn w-5 h-5 rounded-full bg-red-500 border border-neutral-600"></button>
+                            <button onclick="setColor('#eab308')"
+                                class="color-btn w-5 h-5 rounded-full bg-yellow-500 border border-neutral-600"></button>
+                            <button onclick="setColor('#22c55e')"
+                                class="color-btn w-5 h-5 rounded-full bg-green-500 border border-neutral-600"></button>
+                            <button onclick="setColor('#a855f7')"
+                                class="color-btn w-5 h-5 rounded-full bg-purple-500 border border-neutral-600"></button>
+                        </div>
+                        <div class="flex gap-2 items-center">
+                            <div class="relative w-6 h-6 rounded overflow-hidden border border-neutral-600">
+                                <input type="color" id="free-color-input"
+                                    class="absolute -top-1 -left-1 w-10 h-10 cursor-pointer"
+                                    oninput="updateFromPicker(this.value)">
+                            </div>
+                            <div class="flex items-center border-b border-neutral-700 w-16">
+                                <span class="text-neutral-500 text-xs">#</span>
+                                <input type="text" id="hex-input" maxlength="6"
+                                    class="w-full bg-transparent text-xs text-right font-mono uppercase focus:outline-none text-neutral-400"
+                                    oninput="updateFromHex(this.value)">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <button onclick="saveStatus()"
+                    class="w-full bg-neutral-100 hover:bg-white text-black font-bold py-2 rounded-sm text-sm uppercase tracking-wider transition shadow-lg mt-2">
+                    Confirmar Status
+                </button>
+            </div>
+
+            <div class="bg-neutral-900/50 border-t border-neutral-800 max-h-[120px] overflow-y-auto scroller p-2">
+                <div id="active-list" class="space-y-1">
+                    <p class="text-center text-[10px] text-neutral-600 py-2">Nenhum status ativo.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Link para o JS separado -->
+    <script src="script.js" type="text/javascript"></script>
+</body>
+
+</html>

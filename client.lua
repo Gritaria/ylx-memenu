@@ -1,0 +1,221 @@
+local isMenuOpen = false
+local playerStatuses = {} -- Armazena status de todos os jogadores { [serverID] = { [part] = data } }
+local textBackgroundEnabled = true -- Estado do fundo escuro nos textos 3D
+
+-- Debug: Verifica se Config foi carregado
+if Config then
+    print("^2[ylx-memenu] Config carregado! Idioma: " .. Config.Language .. "^7")
+else
+    print("^1[ylx-memenu] ERRO: Config não foi carregado!^7")
+end
+
+-- Pega traduções do config
+local Lang
+if Config and Config.Translations then
+    Lang = Config.Translations[Config.Language]
+    if Lang then
+        print("^2[ylx-memenu] Traduções carregadas para: " .. Config.Language .. "^7")
+    else
+        print("^3[ylx-memenu] Idioma não encontrado, usando PT como fallback^7")
+        Lang = Config.Translations['PT']
+    end
+else
+    print("^3[ylx-memenu] Config.Translations não existe, usando fallback hardcoded^7")
+    Lang = {
+        menu_title = 'Menu',
+        close = 'Fechar',
+        clear = 'Limpar',
+        cabeca = 'Cabeça',
+        tronco = 'Tronco',
+        mao_esq = 'Mão Esquerda',
+        mao_dir = 'Mão Direita',
+        pe_esq = 'Pé Esquerdo',
+        pe_dir = 'Pé Direito',
+        body_location = 'Local do Corpo',
+        description = 'Descrição',
+        description_placeholder = 'Ex: Fratura exposta...',
+        display_time = 'Tempo de Exibição',
+        visible_distance = 'Distância Visível',
+        indicator_color = 'Cor do Indicador',
+        confirm_button = 'Confirmar Status',
+        no_status = 'Nenhum status ativo.',
+        saved = 'SALVO'
+    }
+end
+
+-- Mapeamento de Bones (Ossos) do RDR2
+local boneMap = {
+    ['cabeca'] = 21030,   -- skel_head
+    ['tronco'] = 24860,   -- SKEL_Spine2
+    ['mao_esq'] = 34606,  -- skel_l_hand
+    ['mao_dir'] = 22798,  -- skel_r_hand
+    ['pe_esq'] = 45454,   -- skel_l_foot
+    ['pe_dir'] = 33646    -- skel_r_foot
+}
+
+-- Comando para abrir o menu
+RegisterCommand('memenu', function()
+    print("^2[ylx-memenu] Comando /memenu executado^7")
+    if not isMenuOpen then
+        isMenuOpen = true
+        print("^2[ylx-memenu] Definindo SetNuiFocus(true, true)^7")
+        SetNuiFocus(true, true)
+        print("^2[ylx-memenu] Enviando SendNUIMessage com action='open'^7")
+        
+        -- Envia configurações e traduções para NUI
+        SendNUIMessage({ 
+            action = 'open',
+            config = Config and {
+                maxTime = Config.MaxTime or 20,
+                minTime = Config.MinTime or 3,
+                defaultTime = Config.DefaultTime or 7,
+                maxDistance = Config.MaxDistance or 25,
+                minDistance = Config.MinDistance or 1,
+                defaultDistance = Config.DefaultDistance or 10,
+                defaultTextBackground = Config.DefaultTextBackground ~= nil and Config.DefaultTextBackground or true
+            } or {
+                maxTime = 20,
+                minTime = 3,
+                defaultTime = 7,
+                maxDistance = 25,
+                minDistance = 1,
+                defaultDistance = 10,
+                defaultTextBackground = true
+            },
+            translations = Lang
+        })
+        print("^2[ylx-memenu] Menu deveria estar aberto agora^7")
+        print("^2[ylx-memenu] Idioma enviado para NUI: " .. (Config and Config.Language or 'FALLBACK PT') .. "^7")
+    else
+        print("^3[ylx-memenu] Menu já está aberto^7")
+    end
+end)
+
+-- Callbacks da NUI
+RegisterNUICallback('close', function(data, cb)
+    print("^2[ylx-memenu] Callback 'close' recebido da NUI^7")
+    isMenuOpen = false
+    SetNuiFocus(false, false)
+    cb('ok')
+end)
+
+RegisterNUICallback('updateStatus', function(data, cb)
+    -- Envia para o servidor sincronizar com todos (Namespace atualizado)
+    TriggerServerEvent('ylx-memenu:syncStatus', data.part, data.data)
+    cb('ok')
+end)
+
+RegisterNUICallback('clearAll', function(data, cb)
+    TriggerServerEvent('ylx-memenu:clearAll')
+    cb('ok')
+end)
+
+RegisterNUICallback('setTextBackground', function(data, cb)
+    textBackgroundEnabled = data.enabled
+    print("^2[ylx-memenu] Fundo nos textos 3D: " .. (textBackgroundEnabled and "Ativado" or "Desativado") .. "^7")
+    cb('ok')
+end)
+
+-- Evento de Sincronização (Recebe do servidor)
+RegisterNetEvent('ylx-memenu:receiveSync')
+AddEventHandler('ylx-memenu:receiveSync', function(targetServerId, part, data)
+    if not playerStatuses[targetServerId] then playerStatuses[targetServerId] = {} end
+    
+    if data == nil then
+        -- Remove o status específico
+        playerStatuses[targetServerId][part] = nil
+    else
+        -- Adiciona/Atualiza
+        data.startTime = GetGameTimer() -- Marca quando começou para calcular o tempo
+        playerStatuses[targetServerId][part] = data
+    end
+end)
+
+RegisterNetEvent('ylx-memenu:receiveClear')
+AddEventHandler('ylx-memenu:receiveClear', function(targetServerId)
+    playerStatuses[targetServerId] = nil
+end)
+
+
+-- Loop de Renderização (Draw Text 3D)
+Citizen.CreateThread(function()
+    while true do
+        local sleep = 500
+        local playerPed = PlayerPedId()
+        local playerCoords = GetEntityCoords(playerPed)
+
+        for serverId, statuses in pairs(playerStatuses) do
+            local targetPlayer = GetPlayerFromServerId(serverId)
+            
+            if targetPlayer ~= -1 then
+                local targetPed = GetPlayerPed(targetPlayer)
+                
+                -- Só renderiza se o jogador estiver no stream/perto
+                if DoesEntityExist(targetPed) then
+                    local targetCoords = GetEntityCoords(targetPed)
+                    local distToTarget = #(playerCoords - targetCoords)
+
+                    -- Verifica cada status desse jogador
+                    for part, info in pairs(statuses) do
+                        -- Checa Distância configurada
+                        if distToTarget <= (info.dist or 10.0) then
+                            sleep = 0 -- Ativa o frame se tiver algo pra desenhar
+                            
+                            -- Checa Tempo (se configurado)
+                            local timePassed = (GetGameTimer() - info.startTime) / 1000
+                            if timePassed <= (info.time or 7) then
+                                -- Pega posição do osso
+                                local boneId = boneMap[part]
+                                local boneCoords = targetCoords -- Fallback
+                                
+                                if boneId then
+                                    boneCoords = GetPedBoneCoords(targetPed, boneId, 0.0, 0.0, 0.0)
+                                end
+                                
+                                -- Desenha o Texto
+                                DrawText3D(boneCoords.x, boneCoords.y, boneCoords.z + 0.2, info.text, info.color)
+                            else
+                                -- Tempo expirou, remove localmente pra economizar check
+                                statuses[part] = nil
+                            end
+                        end
+                    end
+                end
+            end
+        end
+        Citizen.Wait(sleep)
+    end
+end)
+
+-- Função auxiliar para desenhar texto 3D no RedM
+function DrawText3D(x, y, z, text, colorHex)
+    local onScreen, _x, _y = GetScreenCoordFromWorldCoord(x, y, z)
+    if onScreen then
+        -- Converte HEX para RGB
+        local r, g, b = HexToRGB(colorHex)
+        
+        SetTextScale(0.35, 0.35)
+        SetTextFontForCurrentCommand(1) -- Fonte padrão legível
+        SetTextColor(r, g, b, 255)
+        SetTextCentre(1)
+        SetTextDropshadow(1, 0, 0, 0, 200)
+        
+        -- Desenha fundo escuro se habilitado
+        if textBackgroundEnabled then
+            -- Calcula o tamanho aproximado do texto
+            local textLength = string.len(text)
+            local width = (textLength * 0.008) + 0.01 -- Largura baseada no comprimento
+            local height = 0.025 -- Altura fixa
+            
+            -- Desenha retângulo de fundo (preto semi-transparente)
+            DrawRect(_x, _y + 0.0115, width, height, 0, 0, 0, 180)
+        end
+        
+        DisplayText(CreateVarString(10, "LITERAL_STRING", text), _x, _y)
+    end
+end
+
+function HexToRGB(hex)
+    hex = hex:gsub("#","")
+    return tonumber("0x"..hex:sub(1,2)), tonumber("0x"..hex:sub(3,4)), tonumber("0x"..hex:sub(5,6))
+end
