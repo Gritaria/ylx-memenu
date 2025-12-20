@@ -5,7 +5,7 @@ games { 'rdr3' }
 
 name 'ylx-memenu'
 author 'yLx'
-description 'Sistema de status médico 3D para RedM - 100% Standalone (sem dependências)'
+description 'Sistema de status 3D para RedM'
 version '2.0.0'
 
 ui_page 'UI/index.html'
