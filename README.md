@@ -1,188 +1,88 @@
 # ylx-memenu
 
-Status display system for RedM with `/me` and `/memenu` commands.
+RedM script to display 3D text status on player body parts.
 
-> ⚠️ **IMPORTANT**: If your framework already has a `/me` command, you must either disable it in the framework OR change the command name in `config.lua` to avoid conflicts.
+> ⚠️ **IMPORTANT**: If your framework already has a `/me` command, you must either disable it OR change the command name in `config.lua` to avoid conflicts.
 
 ---
 
 ## 🇺🇸 English
 
+### What does it do?
+Generates customizable 3D text attached to different body parts of players, visible to nearby players. Perfect for roleplaying injuries, statuses, or emotes.
+
 ### Commands
+- **`/me [text]`** - Quick display at waist (white, 7s, 20m)
+- **`/memenu`** - Opens full configuration menu
 
-| Command | Description |
-|---------|-------------|
-| `/me [text]` | Quick text display at waist with automatic settings |
-| `/memenu` | Opens the full NUI menu for configuration |
-
-### /me Command
-Automatic settings applied:
-- **Color:** White (#FFFFFF)
-- **Background:** Dark enabled
-- **Time:** 7 seconds
-- **Distance:** 20 meters
-- **Location:** Waist
-
-### /memenu Menu
-
-The menu offers the following options:
-
-#### Body Locations
+### Body Locations
 - Head
-- Torso
+- Torso  
 - Waist
-- Left Hand
-- Right Hand
-- Left Foot
-- Right Foot
+- Left/Right Hand
+- Left/Right Foot
 
-#### Settings
-- **Description:** Text field for the status
-- **Display Time:** Adjustable slider (3-20 seconds)
-- **Visible Distance:** Adjustable slider (1-25 meters)
-- **Indicator Color:** Pre-defined colors + free picker
-- **Dark Background:** Checkbox to enable/disable text background
-- **Asterisks:** Checkbox to add *text* automatically
+### Menu Options
+- **Description:** Text to display
+- **Display Time:** 3-60 seconds (configurable max in `config.lua`)
+- **Visible Distance:** 1-25 meters (configurable max in `config.lua`)
+- **Color:** Predefined colors + custom picker
+- **Dark Background:** Toggle text background
+- **Asterisks:** Auto-add *text*
 
-### Configuration
-
-Edit `config.lua` to customize:
-
-```lua
--- Language: 'PT' (Portuguese) or 'EN' (English)
-Config.Language = 'PT'
-
--- Time limits (seconds)
-Config.MaxTime = 20
-Config.MinTime = 3
-Config.DefaultTime = 7
-
--- Distance limits (meters)
-Config.MaxDistance = 25
-Config.MinDistance = 1
-Config.DefaultDistance = 10
-
--- Default options
-Config.DefaultTextBackground = true  -- Dark background
-Config.DefaultAsterisks = true       -- Asterisks (*text*)
-
--- /me Command Settings
-Config.EnableMeCommand = true        -- true = Enable /me | false = Only /memenu
-Config.MeCommandName = 'me'          -- Change to avoid conflicts with framework
-```
+### Available Settings (`config.lua`)
+- **Language:** PT or EN
+- **Time Limits:** Min, max, and default display time
+- **Distance Limits:** Min, max, and default visible distance
+- **Default Options:** Text background, asterisks
+- **Command Settings:** Enable/disable `/me`, change command name
 
 ### Installation
-
-1. Place the `ylx-memenu` folder in your resources folder
-2. Add `ensure ylx-memenu` to your server.cfg
-3. Configure `config.lua` as needed
-4. **⚠️ About /me command:**
-   - If your framework (RSG, VORP, etc.) already has a `/me` command, you have 3 options:
-     - **Option A:** Disable the framework's `/me` command
-     - **Option B:** Change `Config.MeCommandName` to something else (e.g., `'mee'`, `'eme'`, `'status'`)
-     - **Option C:** Set `Config.EnableMeCommand = false` to use only `/memenu`
-5. Restart the server
+1. Place `ylx-memenu` in your resources folder
+2. Add `ensure ylx-memenu` to `server.cfg`
+3. Edit `config.lua` if needed
+4. Restart server
 
 ---
 
 ## 🇧🇷 Português
 
+### O que faz?
+Gera texto 3D customizável anexado em diferentes partes do corpo dos jogadores, visível para jogadores próximos. Perfeito para RP de ferimentos, status ou emotes.
+
 ### Comandos
+- **`/me [texto]`** - Exibição rápida na cintura (branco, 7s, 20m)
+- **`/memenu`** - Abre menu completo de configuração
 
-| Comando | Descrição |
-|---------|-----------|
-| `/me [texto]` | Exibe texto rápido na cintura com configurações automáticas |
-| `/memenu` | Abre o menu NUI completo para configuração |
-
-### Comando /me
-Configurações automáticas aplicadas:
-- **Cor:** Branca (#FFFFFF)
-- **Fundo:** Escuro ativado
-- **Tempo:** 7 segundos
-- **Distância:** 20 metros
-- **Local:** Cintura
-
-### Menu /memenu
-
-O menu oferece as seguintes opções:
-
-#### Locais do Corpo
+### Locais do Corpo
 - Cabeça
 - Tronco
 - Cintura
-- Mão Esquerda
-- Mão Direita
-- Pé Esquerdo
-- Pé Direito
+- Mão Esquerda/Direita
+- Pé Esquerdo/Direito
 
-#### Configurações
-- **Descrição:** Campo de texto para o status
-- **Tempo de Exibição:** Slider ajustável (3-20 segundos)
-- **Distância Visível:** Slider ajustável (1-25 metros)
-- **Cor do Indicador:** Cores pré-definidas + seletor livre
-- **Fundo Escuro:** Checkbox para ativar/desativar fundo nos textos
-- **Asteriscos:** Checkbox para adicionar *texto* automaticamente
+### Opções do Menu
+- **Descrição:** Texto a ser exibido
+- **Tempo de Exibição:** 3-60 segundos (máximo configurável no `config.lua`)
+- **Distância Visível:** 1-25 metros (máximo configurável no `config.lua`)
+- **Cor:** Cores predefinidas + seletor personalizado
+- **Fundo Escuro:** Alternar fundo nos textos
+- **Asteriscos:** Auto-adicionar *texto*
 
-### Configuração
-
-Edite o arquivo `config.lua` para personalizar:
-
-```lua
--- Idioma: 'PT' (Português) ou 'EN' (English)
-Config.Language = 'PT'
-
--- Limites de tempo (segundos)
-Config.MaxTime = 20
-Config.MinTime = 3
-Config.DefaultTime = 7
-
--- Limites de distância (metros)
-Config.MaxDistance = 25
-Config.MinDistance = 1
-Config.DefaultDistance = 10
-
--- Opções padrão
-Config.DefaultTextBackground = true  -- Fundo escuro
-Config.DefaultAsterisks = true       -- Asteriscos (*texto*)
-
--- Configurações do comando /me
-Config.EnableMeCommand = true        -- true = Habilita /me | false = Apenas /memenu
-Config.MeCommandName = 'me'          -- Mude para evitar conflitos com a framework
-```
+### Configurações Disponíveis (`config.lua`)
+- **Idioma:** PT ou EN
+- **Limites de Tempo:** Mín, máx e padrão de exibição
+- **Limites de Distância:** Mín, máx e padrão de visibilidade
+- **Opções Padrão:** Fundo nos textos, asteriscos
+- **Configurações do Comando:** Habilitar/desabilitar `/me`, mudar nome do comando
 
 ### Instalação
-
-1. Coloque a pasta `ylx-memenu` em sua pasta de resources
-2. Adicione `ensure ylx-memenu` ao seu server.cfg
-3. Configure o `config.lua` conforme necessário
-4. **⚠️ Sobre o comando /me:**
-   - Se sua framework (RSG, VORP, etc.) já possui um comando `/me`, você tem 3 opções:
-     - **Opção A:** Desativar o comando `/me` da framework
-     - **Opção B:** Alterar `Config.MeCommandName` para outro nome (ex: `'mee'`, `'eme'`, `'status'`)
-     - **Opção C:** Definir `Config.EnableMeCommand = false` para usar apenas o `/memenu`
-5. Reinicie o servidor
+1. Coloque `ylx-memenu` na pasta de resources
+2. Adicione `ensure ylx-memenu` no `server.cfg`
+3. Edite `config.lua` se necessário
+4. Reinicie o servidor
 
 ---
 
-## 📁 File Structure / Estrutura de Arquivos
-
-```
-ylx-memenu/
-├── fxmanifest.lua
-├── config.lua
-├── client.lua
-├── server.lua
-├── README.md
-└── UI/
-    ├── index.html
-    ├── style.css
-    └── script.js
-```
-
-## 📝 Version / Versão
-
-**v1.1.0**
-
-## 👤 Author / Autor
-
+##  Author / Autor
 **yLx**

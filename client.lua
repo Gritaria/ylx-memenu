@@ -2,25 +2,19 @@ local isMenuOpen = false
 local playerStatuses = {} -- Armazena status de todos os jogadores { [serverID] = { [part] = data } }
 local textBackgroundEnabled = true -- Estado do fundo escuro nos textos 3D
 
--- Debug: Verifica se Config foi carregado
-if Config then
-    print("^2[ylx-memenu] Config carregado! Idioma: " .. Config.Language .. "^7")
-else
-    print("^1[ylx-memenu] ERRO: Config não foi carregado!^7")
-end
+
 
 -- Pega traduções do config
 local Lang
 if Config and Config.Translations then
     Lang = Config.Translations[Config.Language]
     if Lang then
-        print("^2[ylx-memenu] Traduções carregadas para: " .. Config.Language .. "^7")
+        print("^2[ylx-memenu] Script iniciado | Idioma: " .. Config.Language .. "^7")
     else
-        print("^3[ylx-memenu] Idioma não encontrado, usando PT como fallback^7")
         Lang = Config.Translations['PT']
+        print("^2[ylx-memenu] Script iniciado | Idioma: PT (fallback)^7")
     end
 else
-    print("^3[ylx-memenu] Config.Translations não existe, usando fallback hardcoded^7")
     Lang = {
         menu_title = 'Menu',
         close = 'Fechar',
@@ -67,12 +61,9 @@ local boneZOffset = {
 
 -- Comando para abrir o menu
 RegisterCommand('memenu', function()
-    print("^2[ylx-memenu] Comando /memenu executado^7")
     if not isMenuOpen then
         isMenuOpen = true
-        print("^2[ylx-memenu] Definindo SetNuiFocus(true, true)^7")
         SetNuiFocus(true, true)
-        print("^2[ylx-memenu] Enviando SendNUIMessage com action='open'^7")
         
         -- Envia configurações e traduções para NUI
         SendNUIMessage({ 
@@ -96,10 +87,6 @@ RegisterCommand('memenu', function()
             },
             translations = Lang
         })
-        print("^2[ylx-memenu] Menu deveria estar aberto agora^7")
-        print("^2[ylx-memenu] Idioma enviado para NUI: " .. (Config and Config.Language or 'FALLBACK PT') .. "^7")
-    else
-        print("^3[ylx-memenu] Menu já está aberto^7")
     end
 end)
 
@@ -109,7 +96,6 @@ end)
 if Config.EnableMeCommand then
     RegisterCommand(Config.MeCommandName or 'me', function(source, args)
         if #args == 0 then
-            print("^1[ylx-memenu] Uso: /" .. (Config.MeCommandName or 'me') .. " [texto]^7")
             return
         end
         
@@ -134,14 +120,11 @@ if Config.EnableMeCommand then
         
         -- Envia para o servidor sincronizar com todos
         TriggerServerEvent('ylx-memenu:syncStatus', 'cintura', meData)
-        
-        print("^2[ylx-memenu] /" .. (Config.MeCommandName or 'me') .. " enviado: " .. text .. "^7")
     end, false)
 end
 
 -- Callbacks da NUI
 RegisterNUICallback('close', function(data, cb)
-    print("^2[ylx-memenu] Callback 'close' recebido da NUI^7")
     isMenuOpen = false
     SetNuiFocus(false, false)
     cb('ok')
@@ -160,7 +143,6 @@ end)
 
 RegisterNUICallback('setTextBackground', function(data, cb)
     textBackgroundEnabled = data.enabled
-    print("^2[ylx-memenu] Fundo nos textos 3D: " .. (textBackgroundEnabled and "Ativado" or "Desativado") .. "^7")
     cb('ok')
 end)
 

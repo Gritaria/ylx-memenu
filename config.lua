@@ -56,7 +56,7 @@ Config.Translations = {
         -- Form Labels
         body_location = 'Local do Corpo',
         description = 'Descrição',
-        description_placeholder = 'sangrando',
+        description_placeholder = 'Exemplo: sangrando',
         display_time = 'Tempo de Exibição',
         visible_distance = 'Distância Visível',
         indicator_color = 'Cor do Indicador',
@@ -87,7 +87,7 @@ Config.Translations = {
         -- Form Labels
         body_location = 'Body Location',
         description = 'Description',
-        description_placeholder = 'bleeding',
+        description_placeholder = 'Example: bleeding',
         display_time = 'Display Time',
         visible_distance = 'Visible Distance',
         indicator_color = 'Indicator Color',

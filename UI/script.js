@@ -3,6 +3,8 @@ let currentColor = "#ffffff";
 let Config = null;
 let Lang = null;
 let textBackgroundEnabled = true; // Estado do fundo escuro nos textos
+let asterisksEnabled = true; // Estado dos asteriscos
+let firstOpen = true; // Indica se é a primeira abertura do menu na sessão
 
 // Elementos Globais
 const partSelect = document.getElementById('part-select');
@@ -31,7 +33,6 @@ const partsName = {
 // Listener para receber comandos do LUA
 window.addEventListener('message', function (event) {
     if (event.data.action === 'open') {
-        console.log("[NUI] Recebido comando open");
 
         // Recebe configurações e traduções do Lua
         if (event.data.config) {
@@ -58,12 +59,21 @@ window.addEventListener('message', function (event) {
             document.querySelectorAll('.flex.justify-between.text-\\[8px\\]')[1].innerHTML =
                 `<span>${Config.minDistance}m</span><span>${Config.maxDistance}m</span>`;
 
-            // Configura o estado inicial do fundo escuro nos textos
-            if (Config.defaultTextBackground !== undefined) {
-                textBackgroundEnabled = Config.defaultTextBackground;
-                document.getElementById('text-background-checkbox').checked = textBackgroundEnabled;
+            // Configura o estado inicial APENAS na primeira abertura
+            if (firstOpen) {
+                if (Config.defaultTextBackground !== undefined) {
+                    textBackgroundEnabled = Config.defaultTextBackground;
+                }
+                if (Config.defaultAsterisks !== undefined) {
+                    asterisksEnabled = Config.defaultAsterisks;
+                }
+                firstOpen = false;
             }
         }
+
+        // Sincroniza checkboxes com os valores atuais (que persistem na sessão)
+        document.getElementById('text-background-checkbox').checked = textBackgroundEnabled;
+        document.getElementById('asterisks-checkbox').checked = asterisksEnabled;
 
         if (event.data.translations) {
             Lang = event.data.translations;
@@ -72,8 +82,8 @@ window.addEventListener('message', function (event) {
 
         appContainer.classList.add('show');
         loadPartData();
+        textInput.value = ''; // Limpa o texto ao abrir o menu (depois de loadPartData para garantir)
     } else if (event.data.action === 'close') {
-        console.log("[NUI] Recebido comando close");
         appContainer.classList.remove('show');
     }
 });
@@ -134,7 +144,6 @@ function closeUI() {
         const resourceName = window.GetParentResourceName ? GetParentResourceName() : 'ylx-memenu';
         fetch(`https://${resourceName}/close`, { method: 'POST' });
     } else {
-        console.log("Fechando UI (Modo Navegador)");
         appContainer.classList.remove('show');
     }
 }
@@ -148,7 +157,6 @@ function postData(action, data) {
             body: JSON.stringify(data)
         });
     } else {
-        console.log(`[Browser Dev] Enviando ${action}:`, data);
     }
 }
 
@@ -232,9 +240,6 @@ function executeStatus(part) {
         data: data
     });
 
-    // Feedback visual no console
-    console.log(`[NUI] Executando status: ${partsName[part]} - ${data.text}`);
-
     // Fecha o menu após executar
     setTimeout(() => {
         closeUI();
@@ -261,8 +266,11 @@ function toggleTextBackground(enabled) {
 
     // Envia para o client.lua para atualizar os textos 3D no mundo
     postData('setTextBackground', { enabled: enabled });
+}
 
-    console.log(`[NUI] Fundo escuro nos textos 3D: ${enabled ? 'Ativado' : 'Desativado'}`);
+// Função para alternar os asteriscos no texto
+function toggleAsterisks(enabled) {
+    asterisksEnabled = enabled;
 }
 
 function renderList() {
@@ -295,7 +303,6 @@ function renderList() {
 // AUTO-DETECTAR NAVEGADOR PARA TESTES (Permite ver no Canvas ou Navegador)
 window.onload = function () {
     if (!window.invokeNative) {
-        console.log("Modo Navegador Detectado - Exibindo Interface para Teste");
         appContainer.classList.add('show');
         document.body.style.backgroundImage = "url('https://images.unsplash.com/photo-1542256844-3112dc2675da?q=80&w=2070&auto=format&fit=crop')";
         document.body.style.backgroundSize = "cover";
