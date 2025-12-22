@@ -29,6 +29,7 @@ Generates customizable 3D text attached to different body parts of players, visi
 - **Color:** Predefined colors + custom picker
 - **Dark Background:** Toggle text background
 - **Asterisks:** Auto-add *text*
+- **Saved Status List:** Previously used statuses are saved at the bottom of the menu - click any to reactivate it instantly
 
 ### Available Settings (`config.lua`)
 - **Language:** PT or EN
@@ -68,6 +69,7 @@ Gera texto 3D customizável anexado em diferentes partes do corpo dos jogadores,
 - **Cor:** Cores predefinidas + seletor personalizado
 - **Fundo Escuro:** Alternar fundo nos textos
 - **Asteriscos:** Auto-adicionar *texto*
+- **Lista de Status Salvos:** Status usados anteriormente ficam salvos no final do menu - clique em qualquer um para reativá-lo instantaneamente
 
 ### Configurações Disponíveis (`config.lua`)
 - **Idioma:** PT ou EN
