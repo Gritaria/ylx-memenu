@@ -18,10 +18,11 @@ Config.MinDistance = 1   -- Distância mínima (metros)
 Config.DefaultDistance = 10 -- Distância padrão (metros)
 
 -- ============================================
--- FUNDO ESCURO NOS TEXTOS E ASTERISCOS
+-- CONFIGURAÇÃO PADRÃO DO /memenu
+-- Define o estado inicial dos checkboxes quando o menu é aberto
 -- ============================================
-Config.DefaultTextBackground = true  -- true = Fundo escuro ativado por padrão | false = Desativado
-Config.DefaultAsterisks = true       -- true = Asteriscos (*texto*) habilitados por padrão | false = Desativado
+Config.DefaultTextBackground = true  -- true = Checkbox "Fundo Escuro" marcado por padrão no menu | false = Desmarcado
+Config.DefaultAsterisks = true       -- true = Checkbox "Asteriscos" marcado por padrão no menu | false = Desmarcado
 
 -- ============================================
 -- COMANDO /me
@@ -33,6 +34,10 @@ Config.DefaultAsterisks = true       -- true = Asteriscos (*texto*) habilitados 
 -- ============================================
 Config.EnableMeCommand = true        -- true = Habilita o comando /me | false = Apenas /memenu disponível
 Config.MeCommandName = 'me'          -- Nome do comando (mude para evitar conflitos com a framework)
+
+-- Configurações específicas do comando /me (separadas do /memenu)
+Config.MeTextBackground = false       -- true = Comando /me mostra fundo escuro | false = Sem fundo
+Config.MeAsterisks = true            -- true = Comando /me adiciona asteriscos automaticamente (*texto*) | false = Sem asteriscos
 
 -- ============================================
 -- TRADUÇÕES

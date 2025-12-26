@@ -203,11 +203,15 @@ function saveStatus() {
         const addAsterisks = document.getElementById('asterisks-checkbox').checked;
         const finalText = addAsterisks ? `*${text}*` : text;
 
+        // Verifica se deve adicionar fundo escuro
+        const hasBackground = document.getElementById('text-background-checkbox').checked;
+
         statusData[part] = {
             text: finalText,
             time: parseInt(timeSlider.value),
             dist: parseInt(distSlider.value),
-            color: currentColor
+            color: currentColor,
+            textBackground: hasBackground
         };
     }
     renderList();
