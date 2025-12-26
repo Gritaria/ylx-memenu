@@ -1,6 +1,5 @@
 local isMenuOpen = false
 local playerStatuses = {} -- Armazena status de todos os jogadores { [serverID] = { [part] = data } }
-local textBackgroundEnabled = true -- Estado do fundo escuro nos textos 3D
 
 
 
@@ -101,25 +100,22 @@ if Config.EnableMeCommand then
         
         local text = table.concat(args, " ")
         
-        -- Adiciona asteriscos se configurado como padrão
-        if Config.DefaultAsterisks then
+        -- Adiciona asteriscos se configurado nas opções específicas do /me
+        if Config.MeAsterisks then
             text = "*" .. text .. "*"
         end
         
-        -- Configurações automáticas do /me
+        -- Configurações automáticas do /me (usando config específico)
         local meData = {
             text = text,
             color = "#FFFFFF",  -- Cor branca
             time = 7,           -- 7 segundos
             dist = 20,          -- 20 metros
-            textBackground = true -- Fundo escuro ativado
+            textBackground = Config.MeTextBackground -- Respeita a configuração do /me
         }
         
-        -- Ativa o fundo escuro localmente (para garantir que está ativo)
-        textBackgroundEnabled = true
-        
         -- Envia para o servidor sincronizar com todos
-        TriggerServerEvent('ylx-memenu:syncStatus', 'cintura', meData)
+        TriggerServerEvent('ylx-memenu:syncStatus', 'tronco', meData)
     end, false)
 end
 
@@ -141,10 +137,7 @@ RegisterNUICallback('clearAll', function(data, cb)
     cb('ok')
 end)
 
-RegisterNUICallback('setTextBackground', function(data, cb)
-    textBackgroundEnabled = data.enabled
-    cb('ok')
-end)
+
 
 -- Evento de Sincronização (Recebe do servidor)
 RegisterNetEvent('ylx-memenu:receiveSync')
@@ -204,7 +197,7 @@ Citizen.CreateThread(function()
                                 
                                 -- Desenha o Texto com offset específico do bone
                                 local zOffset = boneZOffset[part] or 0.2
-                                DrawText3D(boneCoords.x, boneCoords.y, boneCoords.z + zOffset, info.text, info.color)
+                                DrawText3D(boneCoords.x, boneCoords.y, boneCoords.z + zOffset, info.text, info.color, info.textBackground)
                             else
                                 -- Tempo expirou, remove localmente pra economizar check
                                 statuses[part] = nil
@@ -219,7 +212,7 @@ Citizen.CreateThread(function()
 end)
 
 -- Função auxiliar para desenhar texto 3D no RedM
-function DrawText3D(x, y, z, text, colorHex)
+function DrawText3D(x, y, z, text, colorHex, hasBackground)
     local onScreen, _x, _y = GetScreenCoordFromWorldCoord(x, y, z)
     if onScreen then
         -- Converte HEX para RGB
@@ -231,8 +224,8 @@ function DrawText3D(x, y, z, text, colorHex)
         SetTextCentre(1)
         SetTextDropshadow(1, 0, 0, 0, 200)
         
-        -- Desenha fundo escuro se habilitado
-        if textBackgroundEnabled then
+        -- Desenha fundo escuro se esse status específico tiver habilitado
+        if hasBackground then
             -- Calcula o tamanho aproximado do texto
             local textLength = string.len(text)
             local width = (textLength * 0.006) + 0.005 -- Largura mais compacta
