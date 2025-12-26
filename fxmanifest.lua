@@ -16,9 +16,7 @@ files {
     'UI/script.js'
 }
 
--- Config deve ser carregado PRIMEIRO
 shared_script 'config.lua'
 
--- Scripts client e server depois
 client_script 'client.lua'
 server_script 'server.lua'
